@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -16,19 +17,23 @@ namespace WindowsFormsApp1
         {
             InitializeComponent();
         }
-
         databaseConnection dc = new databaseConnection();
+        SqlConnectionStringBuilder scsb;
+        string connectionString = "";
         private void report_Load(object sender, EventArgs e)
         {
+            scsb = new SqlConnectionStringBuilder();
+            scsb.DataSource = @".";
+            scsb.InitialCatalog = "XX";
+            scsb.IntegratedSecurity = true;
+            connectionString = scsb.ToString();
             dc.setCB("select distinct cargo as good from sellTable", "good", cboxCargo);
 
             dc.setCB("select distinct state as good from sellTable", "good", cboxType);
         }
-
+             
         private void setDGV()
         {
-            string sqlWhere = "";
-
             string sqlDate = "1=1";//代表永遠正確的SQL語句
             if (chkdate.Checked == true)
             {
@@ -55,10 +60,9 @@ namespace WindowsFormsApp1
                 sqlEvening = $"time between '16:00' and '20:00'";
             }
 
-            sqlWhere = sqlDate + " and " + sqlCargo + " and " + sqlType + " and " + sqlMoring + " and " + sqlEvening;
+            string sqlWhere = sqlDate + " and " + sqlCargo + " and " + sqlType + " and " + sqlMoring + " and " + sqlEvening;
+            dc.setDGV($"select cargo as 商品, amount as 數量, unitprice as 單價, price as 總價,state as 售出方式,Convert(nvarchar(50),date,111)as 日期, Convert(nvarchar(50),time,108)as 時間 from sellTable where " + sqlWhere, dGV);
 
-            dc.setDGV($"select cargo as 商品, amount as 數量, unitprice as 單價, price as 總價,state as 售出方式," +
-                $" Convert(nvarchar(50),date,111)as 日期, Convert(nvarchar(50),time,108)as 時間 from sellTable where " + sqlWhere, dGV);
         }
 
         private void btnOK_Click(object sender, EventArgs e)
@@ -119,13 +123,11 @@ namespace WindowsFormsApp1
                     sqlSelect += ",state as 售出方式";
                     sqlGroupBy += ",state";
                 }
-                
 
                 sqlSelect = sqlSelect.Substring(1, sqlSelect.Length - 1);
                 sqlGroupBy = sqlGroupBy.Substring(1, sqlGroupBy.Length - 1);
-
-
-                dc.setDGV($"select {sqlSelect} ,sum(amount)as 數量,sum(price) as 總售價 from sellTable where " + sqlWhere + " group by " + sqlGroupBy, dGV);
+                dc.setDGV($"select {sqlSelect} ,sum(amount)as 數量,sum(price) as 總售價 from sellTable where " + sqlWhere + " group by " + sqlGroupBy, dGV);              
+                
             }
             catch
             {

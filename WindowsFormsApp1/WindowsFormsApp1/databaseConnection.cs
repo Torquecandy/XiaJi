@@ -12,7 +12,7 @@ namespace WindowsFormsApp1
 {
     class databaseConnection
     {
-        public static string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=F:\夏記\WindowsFormsApp1\WindowsFormsApp1\XiaJi.mdf;Integrated Security=True";
+        public static string connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=F:\ADO.net夏記\WindowsFormsApp1\WindowsFormsApp1\XiaJi.mdf;Integrated Security=True";
          public void writeDB(string sqlStr)//寫入資料庫
         {//                 帶入SQL指令)↑ 
             SqlConnection con = new SqlConnection(connectionString);

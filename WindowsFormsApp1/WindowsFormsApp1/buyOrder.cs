@@ -13,13 +13,14 @@ namespace WindowsFormsApp1
 {
     public partial class buyOrder : Form
     {
-        string connectionString = "";
+        
         public buyOrder()
         {
             InitializeComponent();
         }
         databaseConnection dc = new databaseConnection();
         SqlConnectionStringBuilder scsb;
+        string connectionString = "";
 
         private void btnExit_Click(object sender, EventArgs e)
         {
@@ -43,7 +44,7 @@ namespace WindowsFormsApp1
             scsb.DataSource = @".";
             scsb.InitialCatalog = "XX";
             scsb.IntegratedSecurity = true;
-            connectionString = scsb.ToString();
+            connectionString = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=F:\ADO.net夏記\WindowsFormsApp1\WindowsFormsApp1\XiaJi.mdf;Integrated Security=True";
 
 
             setDDD();
@@ -65,7 +66,7 @@ namespace WindowsFormsApp1
             }
             reader.Close();
             con.Close();
-            dgvOrder.Columns[0].Visible = false;
+            
 
             SqlConnection conn = new SqlConnection(connectionString);
             conn.Open();

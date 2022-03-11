@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -13,6 +15,9 @@ namespace WindowsFormsApp1
     public partial class buyOrdersetting : Form
     {
         databaseConnection dc = new databaseConnection();
+
+        SqlConnectionStringBuilder scsb;
+        string connectionString = "";
         string buyOrderid = "";
         public buyOrdersetting()
         {
@@ -42,31 +47,54 @@ namespace WindowsFormsApp1
             }
             if (cut[0] == "update")
             {
+                string ID = cut[1];
                 this.Text = "修改";
-
-                buyOrderid = cut[1];
-
+                scsb = new SqlConnectionStringBuilder();
+                scsb.DataSource = @".";
+                scsb.InitialCatalog = "XX";
+                scsb.IntegratedSecurity = true;
+                connectionString = scsb.ToString();
+                SqlConnection con = new SqlConnection(connectionString);
+                con.Open();
+                string strSQL = "select cargo , unitprice,amount from buyDetail where buyOrderid=@id";
+                SqlCommand cmd = new SqlCommand(strSQL, con);
+                cmd.Parameters.AddWithValue("@id", ID);
+                SqlDataReader reader = cmd.ExecuteReader();                
                 dateTimePicker1.Value = Convert.ToDateTime(cut[2]);
-
                 maskedTextBox1.Text = cut[3];
-
                 txtTotalMoney.Text = cut[4];
-
                 txtVendor.Text = cut[5];
-
-                object[] result = dc.readDB($"select cargo , unitprice,amount from buyDetail where buyOrderid='{buyOrderid}'", 3);
-                if (result[0] != null)
+                ArrayList result1 = new ArrayList();
+                while (reader.Read())
                 {
-                    for (int i = 0; i < result.Length; i = i + 3)
+                    for (int i = 0; i < 3; i++)
                     {
-                        string[] val = { "", "", "" };
-                        val[0] = result[i].ToString();
-                        val[1] = result[i + 1].ToString();
-                        val[2] = result[i + 2].ToString();
-
-                        dGV.Rows.Add(val);
+                        result1.Add(reader[i]);
                     }
                 }
+                reader.Close();
+                con.Close();
+                if (result1.Count != 0)
+                {
+                    object[] a = (object[])result1.ToArray();
+                    object[] result = (object[])a.ToArray();
+                    if (result[0] != null)
+                    {
+                        for (int i = 0; i < result.Length; i = i + 3)
+                        {
+                            string[] val = { "", "", "" };
+                            val[0] = result[i].ToString();
+                            val[1] = result[i + 1].ToString();
+                            val[2] = result[i + 2].ToString();
+                            dGV.Rows.Add(val);
+                        }
+                    }
+                }
+                else
+                {
+                    object[] a = new object[10];
+                    a[0] = null;                    
+                }              
             }
         }       
 
