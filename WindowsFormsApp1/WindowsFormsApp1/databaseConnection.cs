@@ -70,7 +70,6 @@ namespace WindowsFormsApp1
             da.Fill(dt);
             dgv.DataSource = dt;
             con.Close();
-
         }
         public void setCB(string sql, string columnsName, ComboBox ccb)//ComboBox連結資料庫
         {
